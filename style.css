@@ -8,7 +8,7 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000;
+  background: #050505;
   font-family: Arial, sans-serif;
 }
 
@@ -16,7 +16,7 @@ body {
   display: block;
   width: 100vw;
   height: 100vh;
-  background: #000;
+  background: #050505;
 }
 
 .hidden {
@@ -27,60 +27,59 @@ body {
   position: fixed;
   inset: 0;
   z-index: 10;
-
   width: 100vw;
   height: 100dvh;
   padding: 28px 24px;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   overflow: hidden;
-  color: white;
-
-  background: rgba(0, 0, 0, 0.25);
+  color: #eee;
+  background: rgba(0, 0, 0, 0.36);
 }
 
 .menu-box {
   width: min(980px, calc(100vw - 48px));
+  max-height: calc(100dvh - 56px);
   padding: 34px 30px;
-
-  background: rgba(0, 0, 0, 0.66);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 28px;
-
-  box-shadow:
-    0 28px 80px rgba(0, 0, 0, 0.85),
-    0 0 42px rgba(0, 170, 255, 0.16),
-    inset 0 0 32px rgba(255, 255, 255, 0.035);
-
-  backdrop-filter: blur(14px);
+  background: rgba(18, 18, 18, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.72), inset 0 0 18px rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
   text-align: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.menu-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.menu-box::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 99px;
 }
 
 .menu-title {
-  margin: 0 0 12px;
-  font-size: 36px;
+  margin: 0 0 8px;
+  font-size: 40px;
   font-weight: 900;
-  letter-spacing: 2px;
-
-  text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.25),
-    0 0 22px rgba(0, 180, 255, 0.5);
+  letter-spacing: 4px;
+  color: #f1f1f1;
 }
 
 .menu-subtitle {
-  margin: 0 0 28px;
-  color: #d8d8d8;
+  margin: 0 0 26px;
+  color: #c9c9c9;
   font-size: 15px;
   line-height: 1.6;
 }
 
 .menu-buttons {
   display: grid;
-  gap: 15px;
-  max-width: 460px;
+  gap: 14px;
+  max-width: 520px;
   margin: 0 auto;
 }
 
@@ -89,48 +88,36 @@ body {
 .menu-back {
   width: 100%;
   padding: 16px 18px;
-
-  border: none;
-  border-radius: 18px;
-
-  background: linear-gradient(145deg, #ffffff, #d6d6d6);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #eee, #cfcfcf);
   color: #111;
-
   font-size: 16px;
-  font-weight: 900;
-
+  font-weight: 800;
   cursor: pointer;
-
-  box-shadow:
-    0 6px 0 #999,
-    0 12px 28px rgba(0, 0, 0, 0.45);
-
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    background 0.12s ease,
-    opacity 0.12s ease;
+  box-shadow: 0 5px 0 #8d8d8d, 0 12px 25px rgba(0, 0, 0, 0.36);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, opacity 0.12s ease;
 }
 
 .menu-buttons button:hover,
 .stage-grid button:hover,
 .menu-back:hover {
-  background: linear-gradient(145deg, #ffffff, #eeeeee);
+  background: linear-gradient(180deg, #f7f7f7, #ddd);
   transform: translateY(-2px);
 }
 
 .menu-buttons button:active,
 .stage-grid button:active,
 .menu-back:active {
-  transform: translateY(4px);
-  box-shadow:
-    0 2px 0 #999,
-    0 6px 15px rgba(0, 0, 0, 0.45);
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #8d8d8d, 0 7px 16px rgba(0, 0, 0, 0.38);
 }
 
 .stage-grid button:disabled,
-.menu-buttons button:disabled {
-  opacity: 0.35;
+.menu-buttons button:disabled,
+.shop-card:disabled,
+.inventory-card:disabled {
+  opacity: 0.42;
   cursor: not-allowed;
   transform: none;
 }
@@ -160,27 +147,18 @@ body {
 .page-arrow {
   width: 54px;
   height: 100px;
-
   border: none;
   background: transparent;
-  color: white;
-
-  font-size: 48px;
+  color: #eee;
+  font-size: 46px;
   font-weight: 900;
-
   cursor: pointer;
-
-  text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.55),
-    0 0 22px rgba(0, 180, 255, 0.65);
-
-  transition:
-    transform 0.15s ease,
-    opacity 0.15s ease;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .page-arrow:hover {
-  transform: scale(1.15);
+  transform: scale(1.1);
 }
 
 .page-arrow:active {
@@ -188,67 +166,241 @@ body {
 }
 
 .page-arrow:disabled {
-  opacity: 0.12;
+  opacity: 0.16;
   cursor: default;
   transform: none;
 }
 
 .menu-back {
-  max-width: 460px;
+  max-width: 520px;
   margin: 0 auto;
   display: block;
 }
 
 .shop-text,
-.inventory-text {
+.inventory-text,
+.theme-text {
   color: #d0d0d0;
   line-height: 1.7;
+}
+
+.item-meta {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.item-owned {
+  color: #555;
+}
+
+.item-equipped {
+  color: #2f4c2f;
+}
+
+.shop-menu-box {
+  width: min(1100px, calc(100vw - 48px));
+}
+
+.shop-page-wrap {
+  margin: 14px 0 10px;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.shop-card,
+.inventory-card {
+  width: 100%;
+  min-height: 210px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #eeeeee, #d2d2d2);
+  color: #111;
+  box-shadow: 0 5px 0 #888, 0 12px 22px rgba(0, 0, 0, 0.34);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.shop-card:hover,
+.inventory-card:hover {
+  transform: translateY(-2px);
+}
+
+.shop-card:active,
+.inventory-card:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #888, 0 7px 16px rgba(0, 0, 0, 0.38);
+}
+
+.item-preview {
+  width: 100%;
+  height: 108px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.22);
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.28), 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.maze-preview {
+  position: relative;
+  background: #111;
+  isolation: isolate;
+}
+
+.preview-ceiling {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50%;
+  background: #171717;
+}
+
+.preview-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 50%;
+  background: #30302e;
+}
+
+.preview-back-wall {
+  position: absolute;
+  left: 30%;
+  right: 30%;
+  top: 27%;
+  height: 32%;
+  border-radius: 2px;
+  filter: brightness(0.92);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.22);
+}
+
+.preview-left-wall,
+.preview-right-wall {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 43%;
+  filter: brightness(0.72);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.35);
+}
+
+.preview-left-wall {
+  left: 0;
+  clip-path: polygon(0 0, 72% 27%, 72% 59%, 0 100%);
+}
+
+.preview-right-wall {
+  right: 0;
+  clip-path: polygon(28% 27%, 100% 0, 100% 100%, 28% 59%);
+}
+
+.preview-fog {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.16) 70%);
+  pointer-events: none;
+}
+
+.cross-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #303030, #161616 72%);
+  font-size: 64px;
+  font-weight: 300;
+}
+
+.small-preview {
+  height: 72px;
+}
+
+.inventory-menu-box {
+  width: min(1100px, calc(100vw - 48px));
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.inventory-card {
+  min-height: 160px;
+  padding: 10px;
+  font-size: 13px;
+}
+
+.inventory-card .item-meta {
+  font-size: 12px;
+}
+
+.shop-page-text {
+  margin: 4px 0 16px;
 }
 
 #settingScreen {
   position: fixed;
   inset: 0;
   z-index: 20;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   padding: 30px 20px;
-
   background: rgba(0, 0, 0, 0.72);
-  color: white;
+  color: #eee;
 }
 
 #settingScreen > div {
   width: min(420px, 100%);
   padding: 28px 24px;
-
-  background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 22px;
-
+  background: rgba(18, 18, 18, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
   text-align: center;
+}
+
+#settingScreen label {
+  display: block;
+  margin: 18px 0;
+  color: #ddd;
+  text-align: left;
 }
 
 #settingScreen input {
   width: 100%;
+  margin-top: 8px;
+}
+
+.small {
+  color: #bbb;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 #resumeBtn {
   width: 100%;
   margin-top: 20px;
   padding: 14px 18px;
-
   border: none;
-  border-radius: 16px;
-
-  background: white;
+  border-radius: 14px;
+  background: #e8e8e8;
   color: #111;
-
   font-size: 16px;
   font-weight: bold;
-
   cursor: pointer;
 }
 
@@ -267,6 +419,22 @@ body {
     font-size: 13px;
     padding: 14px 8px;
   }
+
+  .shop-card {
+    min-height: 190px;
+  }
+
+  .item-preview {
+    height: 92px;
+  }
+
+  .small-preview {
+    height: 66px;
+  }
+
+  .inventory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 760px) {
@@ -280,7 +448,7 @@ body {
   }
 
   .menu-title {
-    font-size: 28px;
+    font-size: 32px;
   }
 
   .stage-page-wrap {
@@ -301,20 +469,76 @@ body {
     height: 80px;
     font-size: 34px;
   }
+
+  .shop-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-card {
+    min-height: 178px;
+  }
+
+  .item-preview {
+    height: 84px;
+  }
+
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-card {
+    min-height: 132px;
+  }
+}
+
+@media (max-height: 720px) {
+  .menu-box {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+
+  .menu-title {
+    font-size: 32px;
+  }
+
+  .menu-subtitle {
+    margin-bottom: 14px;
+  }
+
+  .shop-page-wrap {
+    margin: 10px 0 6px;
+  }
+
+  .shop-card {
+    min-height: 156px;
+    padding: 10px;
+  }
+
+  .inventory-card {
+    min-height: 126px;
+  }
+
+  .item-preview {
+    height: 66px;
+  }
+
+  .small-preview {
+    height: 52px;
+  }
 }
 
 @media (max-height: 620px) {
   .menu-box {
-    padding: 22px 24px;
+    padding: 18px 22px;
   }
 
   .menu-title {
     font-size: 28px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .menu-subtitle {
-    margin-bottom: 18px;
+    margin-bottom: 10px;
   }
 
   .stage-grid button {
@@ -324,7 +548,15 @@ body {
   }
 
   .page-arrow {
-    height: 76px;
-    font-size: 38px;
+    height: 72px;
+    font-size: 36px;
+  }
+
+  .shop-card {
+    min-height: 136px;
+  }
+
+  .item-preview {
+    height: 54px;
   }
 }
