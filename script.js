@@ -762,7 +762,7 @@ function draw(){
     tiredShake=Math.sin(tiredShakeTimer)*power;
   }
   const centerY=h/2+camBob+tiredShake,currentFov=CONFIG.fov+camFovAdd;
-  drawBackground(w,h,centerY);drawRaycast(w,h,centerY,currentFov);drawCrosshair(w,h);drawUI(w,h);drawCountdown(w,h);
+  drawBackground(w,h,centerY);drawRaycast(w,h,centerY,currentFov);drawRunEffect(w,h);drawCrosshair(w,h);drawUI(w,h);drawCountdown(w,h);
 }
 
 function updateCameraEffect(){
@@ -820,6 +820,55 @@ function drawWall(i,sliceW,h,centerY,rayAngle,hit){
   ctx.fillRect(i*sliceW-0.5,top,sliceW+1,bottom-top);
 }
 
+function drawRunEffect(w,h){
+  if(!isRunning||countdownActive||settingOpen)return;
+
+  const pulse=(Math.sin(performance.now()*0.018)+1)*0.5;
+  const strength=0.08+0.035*pulse;
+
+  ctx.save();
+
+  const vignette=ctx.createRadialGradient(
+    w/2,h/2,Math.min(w,h)*0.22,
+    w/2,h/2,Math.max(w,h)*0.72
+  );
+  vignette.addColorStop(0,"rgba(0,0,0,0)");
+  vignette.addColorStop(0.55,"rgba(0,0,0,0)");
+  vignette.addColorStop(1,`rgba(0,0,0,${strength})`);
+  ctx.fillStyle=vignette;
+  ctx.fillRect(0,0,w,h);
+
+  const sideFade=ctx.createLinearGradient(0,0,w,0);
+  sideFade.addColorStop(0,`rgba(230,230,210,${0.10+0.04*pulse})`);
+  sideFade.addColorStop(0.18,"rgba(230,230,210,0)");
+  sideFade.addColorStop(0.82,"rgba(230,230,210,0)");
+  sideFade.addColorStop(1,`rgba(230,230,210,${0.10+0.04*pulse})`);
+  ctx.fillStyle=sideFade;
+  ctx.fillRect(0,0,w,h);
+
+  ctx.globalAlpha=0.10+0.04*pulse;
+  ctx.strokeStyle="rgba(235,235,220,0.55)";
+  ctx.lineWidth=1;
+
+  const lines=10;
+  const t=performance.now()*0.22;
+  for(let i=0;i<lines;i++){
+    const baseY=(h*(i+1))/(lines+1);
+    const offset=((t+i*37)%90)-45;
+    const y=baseY+offset*0.18;
+    const len=w*(0.045+0.012*(i%3));
+
+    ctx.beginPath();
+    ctx.moveTo(w*0.08,y);
+    ctx.lineTo(w*0.08+len,y);
+    ctx.moveTo(w*0.92,y);
+    ctx.lineTo(w*0.92-len,y);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
 function drawCrosshair(w,h){
   ctx.strokeStyle=getEquippedCrosshairTheme().color;ctx.lineWidth=1;
   ctx.beginPath();
@@ -853,15 +902,14 @@ function getPlayerStateText(){
 }
 
 function drawUI(w,h){
-  const panelX=22,panelY=20,panelW=190;
+  const panelX=22,panelY=20,panelW=172;
   const currentTime=gameMode==="speedrun"
     ? performance.now()-speedrunStartTime
     : performance.now()-stageStartTime;
 
   const lines=[
     {label:"STAGE",value:String(currentStage)},
-    {label:gameMode==="speedrun"?"TOTAL":"TIME",value:formatTime(currentTime)},
-    {label:"STATE",value:getPlayerStateText()}
+    {label:gameMode==="speedrun"?"TOTAL":"TIME",value:formatTime(currentTime)}
   ];
 
   const panelH=22+lines.length*20;
@@ -885,7 +933,7 @@ function drawUI(w,h){
 
     ctx.font="800 12px Arial";
     ctx.fillStyle="#eeeeee";
-    ctx.fillText(line.value,panelX+74,textY-1);
+    ctx.fillText(line.value,panelX+66,textY-1);
 
     textY+=20;
   }
