@@ -924,6 +924,12 @@ function startStage(stage) {
 }
 
 function startNextSpeedrunStage() {
+  const keepW = keys.KeyW;
+  const keepA = keys.KeyA;
+  const keepS = keys.KeyS;
+  const keepD = keys.KeyD;
+  const keepSpace = keys.Space;
+
   currentStage++;
   mazeSize = currentStage + 1;
 
@@ -931,7 +937,14 @@ function startNextSpeedrunStage() {
   generateMaze(mazeSize);
 
   stageStartTime = performance.now();
-  clearInputState();
+
+  keys.KeyW = keepW;
+  keys.KeyA = keepA;
+  keys.KeyS = keepS;
+  keys.KeyD = keepD;
+  keys.Space = keepSpace;
+
+  mouse.dx = 0;
 }
 
 function resetStageState() {
