@@ -266,7 +266,7 @@ function ensureExitButton(){
 }
 
 function exitToMainMenu(){
-  gameStarted=false;settingOpen=false;loopStarted=false;countdownActive=false;countdownCallback=null;
+  gameStarted=false;settingOpen=false;loopStarted=false;countdownActive=false;countdownCallback=null;pauseStartedTime=null;
   settingScreen.classList.add("hidden");startScreen.classList.remove("hidden");
   clearInputState();
   if(document.pointerLockElement===canvas)document.exitPointerLock();
@@ -275,20 +275,53 @@ function exitToMainMenu(){
 
 function showMenuScreen(){
   startScreen.classList.remove("hidden");settingScreen.classList.add("hidden");
-  gameStarted=false;settingOpen=false;countdownActive=false;countdownCallback=null;
+  gameStarted=false;settingOpen=false;countdownActive=false;countdownCallback=null;pauseStartedTime=null;
   clearInputState();
   if(document.pointerLockElement===canvas)document.exitPointerLock();
   generatePreviewRoom();startPreviewLoop();
 }
 
 function openSettings(exitLock=true){
-  settingOpen=true;settingScreen.classList.remove("hidden");ensureExitButton();clearInputState();
-  if(exitLock&&document.pointerLockElement===canvas)document.exitPointerLock();
+  if(!settingOpen){
+    pauseStartedTime=performance.now();
+  }
+
+  settingOpen=true;
+  settingScreen.classList.remove("hidden");
+  ensureExitButton();
+  clearInputState();
+
+  if(exitLock&&document.pointerLockElement===canvas){
+    document.exitPointerLock();
+  }
 }
 
 function closeSettings(){
-  settingOpen=false;settingScreen.classList.add("hidden");clearInputState();
-  setTimeout(()=>{if(gameStarted&&!settingOpen)canvas.requestPointerLock();},0);
+  if(pauseStartedTime!==null){
+    const pauseDuration=performance.now()-pauseStartedTime;
+
+    stageStartTime+=pauseDuration;
+
+    if(gameMode==="speedrun"){
+      speedrunStartTime+=pauseDuration;
+    }
+
+    if(countdownActive){
+      countdownStartTime+=pauseDuration;
+    }
+
+    pauseStartedTime=null;
+  }
+
+  settingOpen=false;
+  settingScreen.classList.add("hidden");
+  clearInputState();
+
+  setTimeout(()=>{
+    if(gameStarted&&!settingOpen){
+      canvas.requestPointerLock();
+    }
+  },0);
 }
 
 function renderMainMenu(){
@@ -330,20 +363,31 @@ function renderStageSelect(){
   }));
 }
 
+function getShopPages(){
+  return [
+    {title:"벽",type:"wall"},
+    {title:"바닥",type:"floor"},
+    {title:"조준점",type:"crosshair"}
+  ];
+}
+
 function renderShop(){
-  const shopIds=Object.keys(SHOP_ITEMS);
-  const pageSize=4;
-  const maxPage=Math.ceil(shopIds.length/pageSize)-1;
+  const pages=getShopPages();
+  const maxPage=pages.length-1;
   shopPage=clamp(shopPage,0,maxPage);
 
-  const start=shopPage*pageSize;
-  const pageItems=shopIds.slice(start,start+pageSize);
+  const page=pages[shopPage];
+  const shopIds=Object.keys(SHOP_ITEMS).filter(id=>SHOP_ITEMS[id].type===page.type);
   let cards="";
 
-  for(const id of pageItems){
-    const item=SHOP_ITEMS[id],owned=ownsTheme(id),enough=getAvailableStars()>=item.cost;
+  for(const id of shopIds){
+    const item=SHOP_ITEMS[id];
+    const owned=ownsTheme(id);
+    const enough=getAvailableStars()>=item.cost;
+
     let status=`${item.cost}★`;
-    if(owned)status="구매 완료";else if(!enough)status="별 부족";
+    if(owned)status="구매 완료";
+    else if(!enough)status="별 부족";
 
     cards+=`
       <button class="shop-card shopItemBtn" data-theme="${id}" ${owned||!enough?"disabled":""}>
@@ -358,11 +402,17 @@ function renderShop(){
   setMenuHTML(`
     <div class="menu-box shop-menu-box">
       <h1 class="menu-title">상점</h1>
-      <p class="menu-subtitle">벽, 바닥, 조준점 테마를 구매할 수 있습니다.<br>총 별: ${getTotalStars()}개 / 사용한 별: ${getSpentStars()}개 / 사용 가능 별: ${getAvailableStars()}개</p>
+      <p class="menu-subtitle">
+        벽, 바닥, 조준점 테마를 구매할 수 있습니다.<br>
+        총 별: ${getTotalStars()}개 / 사용한 별: ${getSpentStars()}개 / 사용 가능 별: ${getAvailableStars()}개
+      </p>
 
       <div class="stage-page-wrap shop-page-wrap">
         <button id="prevShopPageBtn" class="page-arrow" ${shopPage===0?"disabled":""}>◀</button>
-        <div class="shop-grid">${cards}</div>
+        <div>
+          <p class="theme-text"><strong>${page.title}</strong></p>
+          <div class="shop-grid">${cards}</div>
+        </div>
         <button id="nextShopPageBtn" class="page-arrow" ${shopPage===maxPage?"disabled":""}>▶</button>
       </div>
 
@@ -778,21 +828,90 @@ function drawCrosshair(w,h){
   ctx.stroke();
 }
 
-function drawUI(w,h){
-  const uiX=30,uiY=h-50,barW=260,barH=18,rate=stamina/getMaxStamina();
-  ctx.fillStyle="#eeeeee";ctx.font="14px Arial";
-  ctx.fillText(`STAGE ${currentStage}`,30,35);
-  ctx.fillText(`MAZE ${mazeSize} X ${mazeSize}`,30,58);
-  if(gameMode==="speedrun"&&!countdownActive){
-    ctx.fillText(`TOTAL ${formatTime(performance.now()-speedrunStartTime)}`,30,81);
-    ctx.fillText("R RETRY",30,104);
-  }
-  if(tiredTimer>0)ctx.fillText("TIRED",30,gameMode==="speedrun"?127:81);
-  ctx.fillStyle="#111";ctx.fillRect(uiX-2,uiY-2,barW+4,barH+4);
-  ctx.fillStyle="#344233";ctx.fillRect(uiX,uiY,barW,barH);
-  ctx.fillStyle="#93a976";ctx.fillRect(uiX,uiY,barW*rate,barH);
+function fillRoundRect(x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.lineTo(x+w-rr,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+rr);
+  ctx.lineTo(x+w,y+h-rr);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-rr,y+h);
+  ctx.lineTo(x+rr,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-rr);
+  ctx.lineTo(x,y+rr);
+  ctx.quadraticCurveTo(x,y,x+rr,y);
+  ctx.closePath();
+  ctx.fill();
 }
 
+function getPlayerStateText(){
+  if(countdownActive)return "READY";
+  if(tiredTimer>0)return "TIRED";
+  if(isDodging)return "DODGE";
+  if(isRunning)return "RUN";
+  return "NORMAL";
+}
+
+function drawUI(w,h){
+  const panelX=22,panelY=20,panelW=190;
+  const currentTime=gameMode==="speedrun"
+    ? performance.now()-speedrunStartTime
+    : performance.now()-stageStartTime;
+
+  const lines=[
+    {label:"STAGE",value:String(currentStage)},
+    {label:gameMode==="speedrun"?"TOTAL":"TIME",value:formatTime(currentTime)},
+    {label:"STATE",value:getPlayerStateText()}
+  ];
+
+  const panelH=22+lines.length*20;
+
+  ctx.fillStyle="rgba(8,8,8,0.64)";
+  fillRoundRect(panelX,panelY,panelW,panelH,11);
+
+  ctx.strokeStyle="rgba(255,255,255,0.13)";
+  ctx.lineWidth=1;
+  ctx.stroke();
+
+  ctx.textBaseline="top";
+  ctx.shadowColor="rgba(0,0,0,0.7)";
+  ctx.shadowBlur=3;
+
+  let textY=panelY+11;
+  for(const line of lines){
+    ctx.font="700 11px Arial";
+    ctx.fillStyle="#a8a8a8";
+    ctx.fillText(line.label,panelX+13,textY);
+
+    ctx.font="800 12px Arial";
+    ctx.fillStyle="#eeeeee";
+    ctx.fillText(line.value,panelX+74,textY-1);
+
+    textY+=20;
+  }
+
+  ctx.shadowBlur=0;
+  ctx.textBaseline="alphabetic";
+
+  const barW=230,barH=14,barX=24,barY=h-42;
+  const rate=clamp(stamina/getMaxStamina(),0,1);
+
+  ctx.fillStyle="rgba(8,8,8,0.66)";
+  fillRoundRect(barX-8,barY-20,barW+16,barH+34,10);
+
+  ctx.font="700 10px Arial";
+  ctx.fillStyle="#cfcfcf";
+  ctx.fillText("STAMINA",barX,barY-7);
+
+  ctx.fillStyle="#151515";
+  fillRoundRect(barX-2,barY-2,barW+4,barH+4,5);
+
+  ctx.fillStyle="#344233";
+  fillRoundRect(barX,barY,barW,barH,4);
+
+  ctx.fillStyle="#9aaa85";
+  fillRoundRect(barX,barY,barW*rate,barH,4);
+}
 function gameLoop(){
   if(!gameStarted){loopStarted=false;return;}
   update();
